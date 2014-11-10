@@ -1,0 +1,55 @@
+<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}" />
+        <param name="plugin-icon">images/pluginIcon.png</param>
+        <param name="plugin-logo">images/pluginLogo.png</param>
+    </plugin-info>
+
+    <!-- add our i18n resource -->
+    <resource type="i18n" name="i18n" location="pagedatamacro"/>
+    
+    <!-- add our web resources -->
+    <web-resource key="pagedatamacro-resources" name="pagedatamacro Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        
+        <resource type="download" name="pagedatamacro.css" location="/css/pagedatamacro.css"/>
+        <resource type="download" name="pagedatamacro.js" location="/js/pagedatamacro.js"/>
+        <resource type="download" name="images/" location="/images"/>
+        <resource type="velocity" name="template" location="/templates/pagedatamacro.vm"/>
+
+        <context>pagedatamacro</context>
+        <context>editor</context>
+    </web-resource>
+
+    <web-item key="editor-featured-macro-pagedata"
+              name="Page Data"
+              section="system.editor.featured.macros.default"
+              weight="12">
+        <description>Adds some arbitrary page data to the current page</description>
+        <label key="pagedata.action.add" />
+        <link linkId="pagedatamacro"/>
+
+    </web-item>
+    
+    <!-- publish our component -->
+    <component key="myPluginComponent" class="confluence.macro.example.MyPluginComponentImpl" public="true">
+        <interface>confluence.macro.example.MyPluginComponent</interface>
+    </component>
+    
+    <!-- import from the product container -->
+    <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties" />
+    
+
+    <xhtml-macro name="pagedatamacro" class="confluence.macro.example.PagedataMacro" key="pagedatamacro">
+        <parameters>
+            <parameter name="pagedata" type="enum">
+                <value name="OPTION1"></value>
+                <value name="OPTION2"></value>
+            </parameter>
+        </parameters>
+        <description>modifies some page data</description>
+    </xhtml-macro>
+
+</atlassian-plugin>

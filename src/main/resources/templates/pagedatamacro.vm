@@ -1,0 +1,8 @@
+#requireResource("confluence.web.resources:jquery")
+#requireResource("confluence.macro.example.PagedataPlugin:pagedatamacro-resources")
+ 
+<div class="pagedataMacro">
+    <fieldset class="hidden">
+            <input type="hidden" class="pagedata" value="$pagedata">
+    </fieldset>
+</div>
