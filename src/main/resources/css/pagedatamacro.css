@@ -1,5 +1,5 @@
 .PagedataMacro{
-    display:none;
+    display:hidden;
 }
 
 #datapicker.select { width: 100%; }

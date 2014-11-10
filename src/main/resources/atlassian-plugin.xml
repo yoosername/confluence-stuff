@@ -9,8 +9,19 @@
 
     <!-- add our i18n resource -->
     <resource type="i18n" name="i18n" location="pagedatamacro"/>
-    
-    <!-- add our web resources -->
+
+    <!-- add our banner web resources -->
+    <web-resource key="banner-resources" name="banner Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+
+        <resource type="download" name="banner.css" location="/css/banner.css"/>
+        <resource type="download" name="banner.js" location="/js/banner.js"/>
+
+        <context>atl.general</context>
+        <context>atl.admin</context>
+    </web-resource>
+
+    <!-- add our macro specific web resources -->
     <web-resource key="pagedatamacro-resources" name="pagedatamacro Web Resources">
         <dependency>com.atlassian.auiplugin:ajs</dependency>
         
@@ -45,8 +56,12 @@
     <xhtml-macro name="pagedatamacro" class="confluence.macro.example.PagedataMacro" key="pagedatamacro">
         <parameters>
             <parameter name="pagedata" type="enum">
-                <value name="OPTION1"></value>
-                <value name="OPTION2"></value>
+                <value name="1"></value>
+                <value name="2"></value>
+                <value name="3"></value>
+                <value name="4"></value>
+                <value name="5"></value>
+                <value name="6"></value>
             </parameter>
         </parameters>
         <description>modifies some page data</description>

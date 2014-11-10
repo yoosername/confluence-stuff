@@ -1,48 +1,61 @@
 var CLS = {
-    cache : {
-        dialog : ""
-    },
     name : "pagedatamacro",
+    cache : {
+       picker : ""
+    },
     log : function(msg)
     {
         AJS.log(CLS.name + " : " + msg);
     },
-    updateBanner : function()
+    currentData : function()
     {
-         $(".pagedataMacro").each(function()
-         {
-             // add page data to header
-             var pagedata = $(this).find("input.pagedata").val();
-             $("#full-height-container").prepend(pagedata);
-         });
-         CLS.log("Updated banner");
+        var arr = [];
+        // For each macro found on page add data to banner
+        $(".pagedataMacro").each(function()
+        {
+            // capture macro param values
+            arr.push($(this).find("input.pagedata").val());
+        });
+        return arr;
     },
-    macroExists : function()
+    updateBanner : function(msg)
     {
-        return (AJS.$("#wysiwygTextarea_ifr").contents().find("[data-macro-name='"+CLS.name+"']").length > 0);
+        // If Banner placeholder hasnt been added yet then add it
+        if(! AJS.$("#custombanner").length > 0){
+            AJS.$("#full-height-container").prepend("<div id='custombannerplaceholder' class='custombannerplaceholder'></div>");
+            AJS.$("#full-height-container").prepend("<div id='custombanner' class='custombanner'></div>");
+        }
+
+        AJS.$("#custombanner").html(CLS.currentData().toString());
+        CLS.log("Updated banner");
+    },
+    getPageMacros : function()
+    {
+        return AJS.$("#wysiwygTextarea_ifr").contents().find("[data-macro-name='"+CLS.name+"']");
     },
     addCheckToSave : function()
     {
-           AJS.Editor.addSaveHandler(function()
+           //AJS.Editor.addSaveHandler(function()
+           AJS.$("#rte-button-publish").click(function(event)
            {
-             CLS.log("macro found ? " + CLS.macroExists());
-             if( ! CLS.macroExists() )
+             if( ! CLS.getPageMacros().length > 0 )
              {
+                    event.preventDefault();
+                    CLS.log("No macros found on page - redirect to macro create action");
                     AJS.$("[data-macro-name='"+CLS.name+"']").click();
+                    return false;
              }
-             return CLS.macroExists();
            });
            CLS.log("Added custom save handler");
     },
     picker : function(macro)
     {
-        //CLS.log(macro.params.pagedata);
-        // Configure a custom dialog for our pagedata macro
-        if(CLS.cache.dialog == ""){
+        // Configure and cache a custom dialog for our pagedata macro
+        if(CLS.cache.picker == ""){
             dialog = new AJS.Dialog(400, 175);
             dialog.addHeader("Page Data");
 
-            var opts = ["OPTION1","OPTION2"];
+            var opts = ["1","2","3","4","5","6"];
 
             var pickerHtml = "<div class='field-group'>";
             pickerHtml += "<select class='select' id='datapicker'>";
@@ -55,47 +68,38 @@ var CLS = {
 
             dialog.addPanel("SinglePanel", pickerHtml, "singlePanel");
 
-            // hide dialog
-            //dialog.addCancel("Cancel", function() {
-            //    dialog.hide();
-            //});
-
             // 2. add macro to editor
             dialog.addSubmit("Save", function () {
                 var currentParams = {};
-                currentParams["pagedata"] = AJS.$("#clspicker").val();
+                currentParams["pagedata"] = AJS.$("#datapicker").val();
 
+                // add the macro to the page
                 tinymce.confluence.macrobrowser.macroBrowserComplete({"name": CLS.name, "bodyHtml": undefined, "params": currentParams});
                 dialog.hide();
             });
-            CLS.cache.dialog = dialog;
+            CLS.cache.picker = dialog;
          }
-         // If pagedata already on the page then pre select it
 
+         // If pagedata already on the page then pre select it
         if(macro && macro.params && macro.params.pagedata){
             $("#datapicker").val(macro.params.pagedata);
-            CLS.log("preselect pagedata : "+macro.params.pagedata);
+            CLS.log("preselected pagedata : "+macro.params.pagedata);
         }
 
-        return CLS.cache.dialog;
+        return CLS.cache.picker;
     }
 }
-
-// but only need to overide save handler when editor is invoked
-AJS.$(document).ready(function(){
-    CLS.log("dom ready");
-    CLS.updateBanner();
-});
 
 AJS.bind("init.rte", function() {
     CLS.log("editor ready");
 
-    AJS.MacroBrowser.setMacroJsOverride(CLS.name, {opener: function(macro) {
-        // open custom dialog
+    // Intercept Save - add check for pagedatamacros
+    CLS.addCheckToSave();
+
+    // Override macro edit behaviour with custom dialog
+    AJS.MacroBrowser.setMacroJsOverride(CLS.name, {opener: function(macro)
+    {
         CLS.picker(macro).show();
     }});
     CLS.log("added custom macro editor");
-
-
-    CLS.addCheckToSave();
 });

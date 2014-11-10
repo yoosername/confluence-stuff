@@ -1,0 +1,14 @@
+.custombanner{
+    width: 100%;
+    align: center;
+    position: fixed;
+    height: 20px;
+    background: red;
+}
+
+.custombannerplaceholder{
+    width: 100%;
+    align: center;
+    height: 20px;
+    background: red;
+}
